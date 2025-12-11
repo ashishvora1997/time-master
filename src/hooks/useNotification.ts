@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import AutoSound from './ALRMClok_Electronic alarm buzzer 1 (ID 0035)_BSB.wav'
+import AutoSound from './ALRM_buzzer.wav'
 
 export const useNotification = () => {
   const alarmRef = useRef<HTMLAudioElement | null>(null);
