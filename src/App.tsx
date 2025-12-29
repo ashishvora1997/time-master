@@ -21,6 +21,7 @@ function App() {
     completeTimer,
     deleteTimer,
     resetTimer,
+    playTimer,
   } = useTimers();
 
   const { permission, requestPermission, showNotification, stopAlarm } = useNotification();
@@ -45,11 +46,12 @@ function App() {
     const timer = timers.find((t) => t.id === id);
     if (timer) {
       await completeTimer(id);
-      showNotification(`${timer.title} completed!`, {
+      const isData = await showNotification(`${timer.title} completed!`, {
         body: 'Your timer has finished.',
         tag: `timer-${id}`,
         requireInteraction: true,
       });
+      playTimer(id, !!isData);
     }
   };
 
@@ -59,7 +61,17 @@ function App() {
 
   const handleResetTimer = async (id: string) => {
     await resetTimer(id);
+    await stopAlarm();
+    playTimer(id, false);
   };
+
+  const handleStopTimer = async (id: string) => {
+    await stopAlarm();
+    playTimer(id, false);
+  };
+
+      
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -136,6 +148,8 @@ function App() {
                     onReset={handleResetTimer}
                     onDelete={handleDeleteTimer}
                     onComplete={handleCompleteTimer}
+                    onStopAlarm={handleStopTimer}
+                    permission={permission}
                   />
                 ))}
               </div>
@@ -144,14 +158,6 @@ function App() {
         ) : (
           <div className="max-w-md mx-auto">
             <Stopwatch />
-            {permission === 'granted' && (
-              <button
-                onClick={() => stopAlarm()}
-                className="w-full mt-4 bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-xl font-semibold transition-colors"
-              >
-                Stop Alarm
-              </button>
-            )}
           </div>
         )}
       </main>

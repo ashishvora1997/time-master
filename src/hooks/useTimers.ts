@@ -53,6 +53,7 @@ export const useTimers = () => {
         end_time: undefined,
         completed_at: undefined,
         created_at: new Date().toISOString(),
+        play: false,
       };
 
       const updatedTimers = [newTimer, ...timers];
@@ -80,6 +81,13 @@ export const useTimers = () => {
   const pauseTimer = (id: string) => {
     const updatedTimers = timers.map((t) =>
       t.id === id ? { ...t, is_active: false } : t
+    );
+    saveTimers(updatedTimers);
+  };
+
+  const playTimer = (id: string, play: boolean) => {
+    const updatedTimers = timers.map((t) =>
+      t.id === id ? { ...t, is_active: false, play } : t
     );
     saveTimers(updatedTimers);
   };
@@ -129,5 +137,6 @@ export const useTimers = () => {
     deleteTimer,
     resetTimer,
     refetch,
+    playTimer,
   };
 };

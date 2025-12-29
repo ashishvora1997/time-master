@@ -1,7 +1,7 @@
-import { Play, Pause, RotateCcw, Trash2 } from 'lucide-react';
-import { Timer } from '../types/timer';
-import { formatTime, getTimerProgress } from '../utils/timeUtils';
-import { useTimer } from '../hooks/useTimer';
+import { Play, Pause, RotateCcw, Trash2 } from "lucide-react";
+import { Timer } from "../types/timer";
+import { formatTime, getTimerProgress } from "../utils/timeUtils";
+import { useTimer } from "../hooks/useTimer";
 
 interface TimerCardProps {
   timer: Timer;
@@ -10,43 +10,45 @@ interface TimerCardProps {
   onReset: (id: string) => void;
   onDelete: (id: string) => void;
   onComplete: (id: string) => void;
+  onStopAlarm: (id: string) => void;
+  permission: NotificationPermission;
 }
 
 const colorClasses = {
   blue: {
-    bg: 'bg-blue-50',
-    border: 'border-blue-200',
-    text: 'text-blue-900',
-    button: 'bg-blue-600 hover:bg-blue-700',
-    progress: 'bg-blue-600',
+    bg: "bg-blue-50",
+    border: "border-blue-200",
+    text: "text-blue-900",
+    button: "bg-blue-600 hover:bg-blue-700",
+    progress: "bg-blue-600",
   },
   green: {
-    bg: 'bg-green-50',
-    border: 'border-green-200',
-    text: 'text-green-900',
-    button: 'bg-green-600 hover:bg-green-700',
-    progress: 'bg-green-600',
+    bg: "bg-green-50",
+    border: "border-green-200",
+    text: "text-green-900",
+    button: "bg-green-600 hover:bg-green-700",
+    progress: "bg-green-600",
   },
   orange: {
-    bg: 'bg-orange-50',
-    border: 'border-orange-200',
-    text: 'text-orange-900',
-    button: 'bg-orange-600 hover:bg-orange-700',
-    progress: 'bg-orange-600',
+    bg: "bg-orange-50",
+    border: "border-orange-200",
+    text: "text-orange-900",
+    button: "bg-orange-600 hover:bg-orange-700",
+    progress: "bg-orange-600",
   },
   red: {
-    bg: 'bg-red-50',
-    border: 'border-red-200',
-    text: 'text-red-900',
-    button: 'bg-red-600 hover:bg-red-700',
-    progress: 'bg-red-600',
+    bg: "bg-red-50",
+    border: "border-red-200",
+    text: "text-red-900",
+    button: "bg-red-600 hover:bg-red-700",
+    progress: "bg-red-600",
   },
   pink: {
-    bg: 'bg-pink-50',
-    border: 'border-pink-200',
-    text: 'text-pink-900',
-    button: 'bg-pink-600 hover:bg-pink-700',
-    progress: 'bg-pink-600',
+    bg: "bg-pink-50",
+    border: "border-pink-200",
+    text: "text-pink-900",
+    button: "bg-pink-600 hover:bg-pink-700",
+    progress: "bg-pink-600",
   },
 };
 
@@ -57,6 +59,8 @@ export const TimerCard = ({
   onReset,
   onDelete,
   onComplete,
+  onStopAlarm,
+  // permission,
 }: TimerCardProps) => {
   const { remainingTime } = useTimer(
     timer.is_active && timer.end_time
@@ -65,7 +69,8 @@ export const TimerCard = ({
     () => onComplete(timer.id)
   );
 
-  const colors = colorClasses[timer.color as keyof typeof colorClasses] || colorClasses.blue;
+  const colors =
+    colorClasses[timer.color as keyof typeof colorClasses] || colorClasses.blue;
   const displayTime = timer.is_active ? remainingTime : timer.duration;
   const progress = timer.is_active
     ? getTimerProgress(timer.duration, remainingTime)
@@ -117,14 +122,23 @@ export const TimerCard = ({
 
       <div className="flex gap-2">
         {!timer.is_active ? (
-          <button
-            onClick={() => onStart(timer.id)}
-            className={`flex-1 ${colors.button} text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2`}
-            aria-label={`Start ${timer.title} timer`}
+          !timer.play ? (
+            <button
+              onClick={() => onStart(timer.id)}
+              className={`flex-1 ${colors.button} text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2`}
+              aria-label={`Start ${timer.title} timer`}
+            >
+              <Play size={20} />
+              Start
+            </button>
+          ) : (
+            <button
+            onClick={() => onStopAlarm(timer.id)}
+            className="bg-red-600 hover:bg-red-700 flex-1 ${colors.button} text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
           >
-            <Play size={20} />
-            Start
+            Stop Alarm
           </button>
+          )
         ) : (
           <button
             onClick={() => onPause(timer.id)}
@@ -136,14 +150,16 @@ export const TimerCard = ({
           </button>
         )}
 
-        <button
-          onClick={() => onReset(timer.id)}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
-          disabled={!timer.is_active && !timer.completed_at}
-          aria-label={`Reset ${timer.title} timer`}
-        >
-          <RotateCcw size={20} />
-        </button>
+        {timer.is_active && !timer.play && (
+          <button
+            onClick={() => onReset(timer.id)}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
+            disabled={!timer.is_active && !timer.completed_at}
+            aria-label={`Reset ${timer.title} timer`}
+          >
+            <RotateCcw size={20} />
+          </button>
+        )}
       </div>
 
       {!timer.is_active && timer.completed_at && (

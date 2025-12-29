@@ -7,6 +7,7 @@ export interface Timer {
   is_active: boolean;
   end_time?: string;
   color: string;
+  play: boolean;
 }
 
 export interface TimerFormData {
